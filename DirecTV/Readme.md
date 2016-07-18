@@ -1,5 +1,11 @@
 # Home Assistant Component for DirecTV
 
+##Add file to:
+
+```
+<config_dir>/custom_components/media_player/directv.py
+```
+
 Media Player Component.  Add them like:
 
 ```yaml
