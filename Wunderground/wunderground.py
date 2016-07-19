@@ -3,6 +3,7 @@ from datetime import timedelta
 import logging
 import requests
 from homeassistant.helpers.entity import Entity
+from homeassistant.components.sensor import DOMAIN
 from homeassistant.util import Throttle
 from homeassistant.const import CONF_API_KEY, CONF_LATITUDE, CONF_LONGITUDE, TEMP_FAHRENHEIT
 
@@ -52,6 +53,14 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     sensors_add.append(WUndergroundSensor(weather_data, 'template'))
     #Actually add devices
     add_devices(sensors_add)
+
+    #Add a service update call
+    def update(call=None):
+        weather_data.update(no_throttle=True)
+        for sensor in sensors_add:
+            sensor.update()
+
+    hass.services.register(DOMAIN, 'update_weather', update)
 
 
 class WUndergroundSensor(Entity):
