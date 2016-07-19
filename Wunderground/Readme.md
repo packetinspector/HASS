@@ -94,6 +94,29 @@ camera:
 ```
 Would have rather used a template device for this radar image, but there is no display method I could find to do that. 
 
+###Manual Update
+You can use the service call to update the weather when you want or make an input for the GUI
+
+```yaml
+input_boolean:
+  weather_update_input:
+    name: Update
+    initial: off
+    icon: mdi:reload
+
+automation:
+  alias: Update Weather
+  trigger:
+    platform: state
+    entity_id: input_boolean.weather_update_input
+    state: 'on'
+  action:
+    - service: sensor.update_weather
+    - service: homeassistant.turn_off
+      entity_id: 
+        - input_boolean.weather_update_input
+```
+
 ###Notes
 
 - Weather updates every 15 mins
