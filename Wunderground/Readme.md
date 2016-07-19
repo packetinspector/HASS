@@ -92,6 +92,7 @@ camera:
   name: radar
   file_path: /tmp/radar.gif
 ```
+Would have rather used a template device for this radar image, but there is no display method I could find to do that. 
 
 ###Notes
 
