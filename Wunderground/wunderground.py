@@ -55,7 +55,6 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 
 
 class WUndergroundSensor(Entity):
-    """A class for the PWS"""
 
     def __init__(self, weather, data_type, radar=False):
         """Initialize the sensor."""
