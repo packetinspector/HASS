@@ -96,19 +96,25 @@ class WUndergroundSensor(Entity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        if self._data_type == 'temperature':
-            return self._weather._weather_data['current_observation']['temp_f']
-        elif self._data_type == 'icon':
-            return self._weather._weather_data['current_observation']['weather']
-        else:
+        try:
+            if self._data_type == 'temperature':
+                return self._weather._weather_data['current_observation']['temp_f']
+            elif self._data_type == 'icon':
+                return self._weather._weather_data['current_observation']['weather']
+            else:
+                return None
+        except:
             return None
 
     @property
     def entity_picture(self):
         """Return the entity picture."""
-        if self._data_type == 'icon':
-            return self._weather._weather_data['current_observation']['icon_url']
-        return None
+        try:
+            if self._data_type == 'icon':
+                return self._weather._weather_data['current_observation']['icon_url']
+            return None
+        except:
+            return None
 
     @property
     def device_state_attributes(self):
