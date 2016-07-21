@@ -27,7 +27,10 @@ class KodiNotificationService(BaseNotificationService):
 
     def send_message(self, message="", **kwargs):
         #Send message
-        to_post = {"id": 1, "jsonrpc": "2.0", "method": "GUI.ShowNotification", "params": {"title": 'Home Assistant', "message": message}}
+        title = kwargs.get(ATTR_TITLE)
+        if title is None:
+            title = 'Home Assistant'
+        to_post = {"id": 1, "jsonrpc": "2.0", "method": "GUI.ShowNotification", "params": {"title": title, "message": message}}
         try:
             import requests
             r = requests.post('http://{}:{}/jsonrpc'.format(self._kodi, self._port), json=to_post, timeout=2)
