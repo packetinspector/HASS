@@ -9,7 +9,7 @@ This should work with most entity types
 * Other event_data will be provisioned to the device and the original attributes stored
 * On restore the original attributes and state will be provisioned
 * A listener is added to the invoked entity_id and on change will clear the stored attributes
-* (You turn the light off, someone else turns it on, on restore it will stay on)
+ * (Script turns light off, someone turns it on, on script's restore it will stay on)
 
 ### AppDaemon Setup
 ```yaml
