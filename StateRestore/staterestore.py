@@ -35,7 +35,7 @@ class StateRestore(appapi.AppDaemon):
         # Check for an existing listener
         if e not in self.entities:
             self.entities[e] = {}
-        self.entities[e]['handle'] = self.listen_state(self.stoplisten, e=e, force=False)
+        self.entities[e]['handle'] = self.listen_state(self.stoplisten, e, force=False)
         self.entities[e]['first'] = True
 
     def stoplisten(self, e, attribute=None, old=None, new=None, kwargs=None, force=False):
