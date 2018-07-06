@@ -30,7 +30,7 @@ playnewsfrompvr:
 
 This was designed to be called from an event or invoked via script(above), but you can make a simple frontend for it in HA
 
-![screen1](https://image)
+![screen1](https://github.com/packetinspector/HASS/raw/master/KodiAppDaemon/frontend.png)
 
 ####Configuration.yaml
 ```yaml
