@@ -16,7 +16,7 @@ kodifunctions:
   class: SearchPlayKodi
 ```
 
-###Sample Script
+### Sample Script in HA
 ```yaml
 playnewsfrompvr:
   alias: PlayTheNews
@@ -32,7 +32,7 @@ This was designed to be called from an event or invoked via script(above), but y
 
 ![screen1](https://github.com/packetinspector/HASS/raw/master/KodiAppDaemon/frontend.png)
 
-####Configuration.yaml
+#### configuration.yaml
 ```yaml
 input_boolean:
   kodi_play_watched:
@@ -61,7 +61,7 @@ input_select:
       - Random
 ```
 
-####Groups.yaml
+#### groups.yaml
 ```yaml
 KodiPlayer:
   name: Kodi Player
@@ -74,7 +74,7 @@ KodiPlayer:
     - script.kodiplaysearch
 ```
 
-####scripts.yaml
+#### scripts.yaml
 ```yaml
 kodiplaysearch:
   alias: Play Search
