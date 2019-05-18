@@ -38,13 +38,13 @@ This was designed to be called from an event or invoked via script(above), but y
 ### Optional Lovelace usage
 ```yaml
 name: Simpsons
-        entity: scene.all_dim
-        tap_action:
-          service: python_script.watch_something
-          action: call-service
-          service_data:
-            show_name: simpsons
-        icon: 'mdi:emoticon-happy'
+entity: scene.all_dim
+tap_action:
+  service: python_script.watch_service
+  action: call-service
+  service_data:
+    show_name: simpsons
+icon: 'mdi:emoticon-happy'
 ```
 
 #### configuration.yaml
