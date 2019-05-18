@@ -1,3 +1,8 @@
+### Purpose
+Set the state of something and when ready return that entity to its original state. 
+e.g.  Turn a light a particular color when motion detected, return when motion is clear
+
+
 
 ### Directions
 This should work with most entity types
