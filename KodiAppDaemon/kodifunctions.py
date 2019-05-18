@@ -114,14 +114,14 @@ class SearchPlayKodi(hass.Hass):
             e = data["entity_id"]
             s = data["search_string"]
 
-        # Check search string
-        if len(s) < 3:
-            self.log("Need a longer Search String.")
-            return
-
         # Set global var
         self.current_search = {}
         self.current_search = {"search_string": s.lower(), "player": e, **optionals}
+        # Check search string
+        if len(self.current_search['search_string']) < 3:
+            self.notify_kodi("Need a longer Search String")
+            self.log("Need a longer Search String.")
+            return
         # Log Attempt
         self.log(self.current_search)
         # Go for it
@@ -153,6 +153,7 @@ class SearchPlayKodi(hass.Hass):
                 self.search_kodi(self.current_search['player'], tvshowid, 'RawEpisodes')
             else:
                 self.log("No or too many matches for search: {}".format(self.current_search['search_string']))
+                self.notify_kodi("No or too many matches for search: {}".format(self.current_search['search_string']))
 
         elif method == "VideoLibrary.GetEpisodes":
             self.process_results(result['episodes'])
@@ -178,6 +179,7 @@ class SearchPlayKodi(hass.Hass):
             matches = results
         if len(matches) < 1:
             # Nothing to do now
+            self.notify_kodi('No Matches to Search {}'.format(self.current_search['search_string']))
             self.log('No Matches to Search {}'.format(self.current_search['search_string']))
             return
         # self.log(matches)
@@ -196,6 +198,7 @@ class SearchPlayKodi(hass.Hass):
                 # Play the last element
                 to_play = matches_sorted.pop()
             else:
+                self.notify_kodi('Sorting Error')
                 self.log("Sorting Error")
                 return
         # Should be good..but check again and then play
@@ -203,8 +206,13 @@ class SearchPlayKodi(hass.Hass):
             self.log("I want to play!")
             self.log(to_play)
             self.play_kodi(to_play['file'])
+            self.notify_kodi('Episode: {label} Playcount: {playcount}'.format(**to_play))
         else:
+            self.notify_kodi('Unknown Error')
             self.log('Unknown Error')
+
+    def notify_kodi(self, message, title='Ultrahouse KodiPlayer'):
+        self.call_service('media_player/kodi_call_method', entity_id=self.current_search['player'], method='GUI.ShowNotification', title=title, message=message)
 
     def play_kodi(self, media_id=None, media_type='file', resume=None):
         self.call_service('media_player/play_media', entity_id=self.current_search['player'], media_content_type=media_type, media_content_id=media_id)
