@@ -9,6 +9,9 @@ Uses:
 * HA w/ Kodi media player component
 * Kodi 17.x (no addons needed)
 
+Optional:
+* Python script for calling via service
+
 ### AppDaemon Setup
 ```yaml
 kodifunctions:
@@ -31,6 +34,18 @@ playnewsfrompvr:
 This was designed to be called from an event or invoked via script(above), but you can make a simple frontend for it in HA
 
 ![screen1](https://github.com/packetinspector/HASS/raw/master/KodiAppDaemon/frontend.png)
+
+### Optional Lovelace usage
+```yaml
+name: Simpsons
+        entity: scene.all_dim
+        tap_action:
+          service: python_script.watch_something
+          action: call-service
+          service_data:
+            show_name: simpsons
+        icon: 'mdi:emoticon-happy'
+```
 
 #### configuration.yaml
 ```yaml
