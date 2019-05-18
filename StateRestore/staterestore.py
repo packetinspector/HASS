@@ -1,7 +1,7 @@
-import appdaemon.appapi as appapi
+import appdaemon.plugins.hass.hassapi as hass
 
 
-class StateRestore(appapi.AppDaemon):
+class StateRestore(hass.Hass):
 
     def initialize(self):
         # Init the dictionary to hold state info
@@ -20,7 +20,7 @@ class StateRestore(appapi.AppDaemon):
             self.dorestore(data)
         else:
             e = data["entity_id"]
-            # Start a listener to look for changes.  
+            # Start a listener to look for changes
             # If the state changes before a restore, this will cancel the restore
             self.startlisten(e, True)
             # Do what was asked in the event
@@ -35,8 +35,8 @@ class StateRestore(appapi.AppDaemon):
         # Check for an existing listener
         if e not in self.entities:
             self.entities[e] = {}
-        self.entities[e]['handle'] = self.listen_state(self.stoplisten, e, force=False)
         self.entities[e]['first'] = True
+        self.entities[e]['handle'] = self.listen_state(self.stoplisten, e, force=False)
 
     def stoplisten(self, e, attribute=None, old=None, new=None, kwargs=None, force=False):
         if e not in self.entities:
@@ -73,7 +73,12 @@ class StateRestore(appapi.AppDaemon):
     def doaction(self, data):
         # Capture entity data
         e = data["entity_id"]
-        current_state = self.get_state(e, "all")
+        current_state = self.get_state(entity=e, attribute="all")
+        # Odd?
+        if current_state is None:
+            self.log("Exiting action. No state found for data: {}".format(data))
+            return
+        # Okay check if we know about it
         if e not in self.entities:
             self.entities[e] = {}
         self.log(current_state)
