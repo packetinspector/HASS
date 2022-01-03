@@ -2,7 +2,6 @@ import appdaemon.plugins.hass.hassapi as hass
 
 
 class StateRestore(hass.Hass):
-
     def initialize(self):
         # Init the dictionary to hold state info
         self.entities = {}
@@ -16,7 +15,10 @@ class StateRestore(hass.Hass):
             self.log("No Entity Specified. Doing Nothing")
             return
         # Check if entity_id is the only key. If so restore state
-        if ("entity_id" in data) and (len(data) == 1):
+        # self.log("The event data was:")
+        # self.log(data)
+        if ("entity_id" in data) and ("state" not in data):
+            self.log("Restoring State!")
             self.dorestore(data)
         else:
             e = data["entity_id"]
@@ -35,10 +37,12 @@ class StateRestore(hass.Hass):
         # Check for an existing listener
         if e not in self.entities:
             self.entities[e] = {}
-        self.entities[e]['first'] = True
-        self.entities[e]['handle'] = self.listen_state(self.stoplisten, e, force=False)
+        self.entities[e]["first"] = True
+        self.entities[e]["handle"] = self.listen_state(self.stoplisten, e, force=False)
 
-    def stoplisten(self, e, attribute=None, old=None, new=None, kwargs=None, force=False):
+    def stoplisten(
+        self, e, attribute=None, old=None, new=None, kwargs=None, force=False
+    ):
         if e not in self.entities:
             # Nothing to do
             return
@@ -47,14 +51,14 @@ class StateRestore(hass.Hass):
         # except KeyError:
         #     force = False
         self.log("Force: {}".format(force))
-        if self.entities[e]['first'] is True and not force:
+        if self.entities[e]["first"] is True and not force:
             # The first state change may occur from this script. Ignore it
             self.log("Ignoring first state change of {}".format(e))
-            self.entities[e]['first'] = False
+            self.entities[e]["first"] = False
         else:
             self.log("Canceling listener for: {}".format(e))
             try:
-                self.cancel_listen_state(self.entities[e]['handle'])
+                self.cancel_listen_state(self.entities[e]["handle"])
                 # Remove data from app
                 self.entities.pop(e, None)
             except KeyError:
@@ -63,17 +67,17 @@ class StateRestore(hass.Hass):
 
     def dotimeout(self, kwargs):
         # After waiting remove the first check
-        self.log('Removing first state check for {}'.format(kwargs['e']))
+        self.log("Removing first state check for {}".format(kwargs["e"]))
         try:
-            self.entities[kwargs['e']]['first'] = False
+            self.entities[kwargs["e"]]["first"] = False
         except KeyError:
-            self.log('Error Setting Status. Restore may have been removed')
+            self.log("Error Setting Status. Restore may have been removed")
         return
 
     def doaction(self, data):
         # Capture entity data
         e = data["entity_id"]
-        current_state = self.get_state(entity=e, attribute="all")
+        current_state = self.get_state(e, attribute="all")
         # Odd?
         if current_state is None:
             self.log("Exiting action. No state found for data: {}".format(data))
@@ -81,24 +85,51 @@ class StateRestore(hass.Hass):
         # Okay check if we know about it
         if e not in self.entities:
             self.entities[e] = {}
-        self.log(current_state)
+        # self.log("Current state: {}".format(current_state))
         # Check the current state to decide what to do
-        if current_state['state'] == 'on':
+        if current_state["state"] == "on":
             # It May have attributes we want
             # Take the things you are applying and store their current state in prep for kwargs
-            store = {k: current_state['attributes'][k] for (k, v) in data.items() if k not in ['entity_id', 'state']}
-            self.log('Captured State: {}'.format(store))
-            self.entities[e]['data'] = store
+            store = {
+                k: current_state["attributes"][k]
+                for (k, v) in data.items()
+                if k
+                not in [
+                    "entity_id",
+                    "state",
+                    "metadata",
+                    "effect_list",
+                    "friendly_name",
+                    "supported_features",
+                ]
+            }
+            self.entities[e]["data"] = store
         else:
             # Turn off
-            self.entities[e]['data'] = {}
-        self.entities[e]['state'] = current_state['state']
+            self.entities[e]["data"] = {}
+        self.entities[e]["state"] = current_state["state"]
+        self.log("Captured State: {}".format(self.entities[e]))
 
         # Seems the yaml sometimes returns on as True, just test for either..
-        if data["state"] is True or data["state"] == 'on':
+        if "state" in data and (data["state"] is True or data["state"] == "on"):
             # Turn something on
             self.log("Turning {} on".format(e))
-            self.turn_on(e, **{k: v for (k, v) in data.items() if k not in ['entity_id', 'state']})
+            self.turn_on(
+                e,
+                **{
+                    k: v
+                    for (k, v) in data.items()
+                    if k
+                    not in [
+                        "entity_id",
+                        "state",
+                        "metadata",
+                        "effect_list",
+                        "friendly_name",
+                        "supported_features",
+                    ]
+                }
+            )
         else:
             # Turn something off
             self.log("Turning {} off".format(e))
@@ -111,8 +142,8 @@ class StateRestore(hass.Hass):
             self.log("No restore for: {}".format(e))
             return
         # Check the state we need to move to
-        if self.entities[e]['state'] == 'on':
-            self.turn_on(e, **self.entities[e]['data'])
+        if "state" in self.entities[e] and self.entities[e]["state"] == "on":
+            self.turn_on(e, **self.entities[e]["data"])
         else:
             self.turn_off(e)
         # Cancel the listener just in case
